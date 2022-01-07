@@ -147,16 +147,14 @@ class LeafNode extends BPlusNode {
     @Override
     public LeafNode get(DataBox key) {
         // TODO(proj2): implement
-
-        return null;
+        return this;
     }
 
     // See BPlusNode.getLeftmostLeaf.
     @Override
     public LeafNode getLeftmostLeaf() {
         // TODO(proj2): implement
-
-        return null;
+        return this;
     }
 
     // See BPlusNode.put.
@@ -164,6 +162,23 @@ class LeafNode extends BPlusNode {
     public Optional<Pair<DataBox, Long>> put(DataBox key, RecordId rid) {
         // TODO(proj2): implement
 
+        int pos = Collections.binarySearch(this.keys, key);
+
+        // 중복 키가 있을 때 예외 호출
+        if (pos >= 0) {
+            throw new BPlusTreeException("Duplicate Keys");
+        }
+
+        // 삽입할 위치
+        pos = (-1 * pos) - 1;
+
+        this.keys.add(pos, key);
+        this.rids.add(pos, rid);
+
+        sync();
+        // Leaf 노드가 넘쳤을 때 (* 미구현 *)
+
+        // Leaf 노드가 넘치지 않았을 때
         return Optional.empty();
     }
 
@@ -180,8 +195,11 @@ class LeafNode extends BPlusNode {
     @Override
     public void remove(DataBox key) {
         // TODO(proj2): implement
+        int pos = Collections.binarySearch(this.keys, key);
 
-        return;
+        this.keys.remove(key);
+        this.rids.remove(pos);
+        sync();
     }
 
     // Iterators ///////////////////////////////////////////////////////////////
